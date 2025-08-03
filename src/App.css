@@ -1,0 +1,22 @@
+#root {
+  margin: 0 auto;
+}
+* {
+  transition: 0.5s all;
+}
+body{
+  background-color:  #34495E ;
+  color: white;
+}
+@media (max-width: 600px) {
+  #icon{
+    font-size: 150px;
+  }
+
+}
+@media (min-width: 600px) {
+  #icon{
+    font-size: 200px;
+  }
+  
+}
