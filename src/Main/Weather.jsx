@@ -101,7 +101,7 @@ export default function Weather() {
         {/* Button Change language */}
         <div className={`absolute ${trans == "en" ? "right-0" : "left-0"} `}>
           <Button color="primary" onClick={handelClick}>
-            {trans == "en" ? "Arabic" : "انجليزي"}
+            {trans == "ar" ? "Arabic" : "انجليزي"}
           </Button>
         </div>
       </div>
