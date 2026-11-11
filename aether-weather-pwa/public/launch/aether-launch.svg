@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="844" viewBox="0 0 390 844">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="390" y2="844" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#080f25"/><stop offset=".54" stop-color="#19264f"/><stop offset="1" stop-color="#293b66"/>
+    </linearGradient>
+    <radialGradient id="aura" cx="0" cy="0" r="1" gradientTransform="matrix(0 360 -300 0 195 470)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffcf80" stop-opacity=".26"/><stop offset="1" stop-color="#82dfff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sun" x1="144" y1="324" x2="249" y2="450" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff5cb"/><stop offset=".55" stop-color="#ffd27c"/><stop offset="1" stop-color="#f18e79"/>
+    </linearGradient>
+    <linearGradient id="horizon" x1="195" y1="430" x2="195" y2="700" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#a0edff" stop-opacity=".82"/><stop offset=".32" stop-color="#4799c9" stop-opacity=".52"/><stop offset="1" stop-color="#172747" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="28"/></filter>
+  </defs>
+  <rect width="390" height="844" fill="url(#bg)"/>
+  <circle cx="195" cy="470" r="290" fill="url(#aura)"/>
+  <g fill="#fff" opacity=".66">
+    <circle cx="43" cy="108" r="1.5"/><circle cx="312" cy="93" r="1.6"/><circle cx="352" cy="210" r="1.1"/>
+    <circle cx="76" cy="285" r="1.2"/><circle cx="280" cy="330" r="1.4"/><circle cx="128" cy="174" r="1"/>
+    <circle cx="30" cy="410" r="1.2"/><circle cx="355" cy="490" r="1.3"/><circle cx="306" cy="610" r="1"/>
+  </g>
+  <circle cx="195" cy="416" r="120" fill="#ffd58b" opacity=".22" filter="url(#blur)"/>
+  <circle cx="195" cy="414" r="59" fill="url(#sun)"/>
+  <path d="M195 316v-17M195 529v-17M97 414H80M310 414h-17M126 345l-12-12M276 495l-12-12M264 345l12-12M126 483l-12 12" stroke="#ffe9bc" stroke-width="4" stroke-linecap="round" opacity=".95"/>
+  <path d="M0 462c68-62 136-75 198-57 62 18 119 5 192-49v488H0V462Z" fill="url(#horizon)"/>
+  <path d="M-12 471c70-60 145-73 210-54 69 20 132 7 205-44" fill="none" stroke="#9ce8ff" stroke-width="3" stroke-linecap="round"/>
+  <path d="M-10 504c82-47 152-53 214-36 62 17 123 12 196-19" fill="none" stroke="#f5c69a" stroke-width="1.5" stroke-opacity=".48"/>
+  <g transform="translate(163 622)" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="3">
+    <path d="M32 0v-12M32 56V44M4 16h-12M72 16H60M12 -4l-8-8M60 40l8 8M52 -4l8-8M12 40l-8 8" opacity=".78"/>
+    <circle cx="32" cy="16" r="15" fill="#fff" fill-opacity=".08" stroke="#fff" stroke-opacity=".5"/>
+  </g>
+  <text x="195" y="730" font-family="Manrope, Arial, sans-serif" font-size="26" font-weight="800" letter-spacing="5" text-anchor="middle" fill="#fff">AETHER</text>
+  <text x="195" y="758" font-family="Arial, sans-serif" font-size="11" letter-spacing="2.5" text-anchor="middle" fill="#c6d7f3">THE WEATHER, AS A LIVING SKY</text>
+  <path d="M144 792h102" stroke="#d5e6ff" stroke-opacity=".24" stroke-width="2" stroke-linecap="round"/>
+</svg>
