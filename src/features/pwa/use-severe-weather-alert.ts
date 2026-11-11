@@ -25,19 +25,40 @@ function localDate(timezone: string): string {
 }
 
 export function hasSevereWeather(forecast: Forecast): boolean {
-  if (forecast.current.weatherCode !== null && THUNDERSTORM_CODES.has(forecast.current.weatherCode)) return true;
+  if (
+    forecast.current.weatherCode !== null &&
+    THUNDERSTORM_CODES.has(forecast.current.weatherCode)
+  )
+    return true;
   const horizon = Date.now() + 6 * 60 * 60_000;
   return forecast.hourly.some((hour) => {
     if (hour.time < Date.now() || hour.time > horizon) return false;
-    if (hour.weatherCode !== null && (THUNDERSTORM_CODES.has(hour.weatherCode) || INTENSE_WEATHER_CODES.has(hour.weatherCode))) return true;
-    return (hour.precipProbability ?? 0) >= 90 && (hour.precipitation ?? 0) >= 3;
+    if (
+      hour.weatherCode !== null &&
+      (THUNDERSTORM_CODES.has(hour.weatherCode) ||
+        INTENSE_WEATHER_CODES.has(hour.weatherCode))
+    )
+      return true;
+    return (
+      (hour.precipProbability ?? 0) >= 90 && (hour.precipitation ?? 0) >= 3
+    );
   });
 }
 
 /** Foreground alerts only. Background push requires a server-side Web Push sender and VAPID keys. */
-export function useSevereWeatherAlert(forecast: Forecast | null, enabled: boolean, language: Language) {
+export function useSevereWeatherAlert(
+  forecast: Forecast | null,
+  enabled: boolean,
+  language: Language,
+) {
   useEffect(() => {
-    if (!enabled || !forecast || typeof Notification === "undefined" || Notification.permission !== "granted") return;
+    if (
+      !enabled ||
+      !forecast ||
+      typeof Notification === "undefined" ||
+      Notification.permission !== "granted"
+    )
+      return;
     if (Date.now() - forecast.fetchedAt > 90 * 60_000) return;
     if (!("serviceWorker" in navigator) || !hasSevereWeather(forecast)) return;
 
@@ -48,7 +69,8 @@ export function useSevereWeatherAlert(forecast: Forecast | null, enabled: boolea
       if (previous === "sent") return;
       if (previous?.startsWith("pending:")) {
         const startedAt = Number(previous.slice("pending:".length));
-        if (Number.isFinite(startedAt) && Date.now() - startedAt < 60_000) return;
+        if (Number.isFinite(startedAt) && Date.now() - startedAt < 60_000)
+          return;
       }
       localStorage.setItem(key, `pending:${Date.now()}`);
     } catch {
@@ -64,7 +86,7 @@ export function useSevereWeatherAlert(forecast: Forecast | null, enabled: boolea
           icon: `${import.meta.env.BASE_URL}icons/icon-192.png`,
           badge: `${import.meta.env.BASE_URL}icons/icon-badge-96.png`,
           tag: `aether-severe-${placeKey(forecast.place)}`,
-          renotify: false,
+
           dir: language === "ar" ? "rtl" : "ltr",
           lang: language,
         });
@@ -78,7 +100,8 @@ export function useSevereWeatherAlert(forecast: Forecast | null, enabled: boolea
       .catch(() => {
         pendingAlerts.delete(key);
         try {
-          if (localStorage.getItem(key)?.startsWith("pending:")) localStorage.removeItem(key);
+          if (localStorage.getItem(key)?.startsWith("pending:"))
+            localStorage.removeItem(key);
         } catch {
           // Storage is optional; failed notification delivery must not affect the dashboard.
         }

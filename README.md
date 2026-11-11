@@ -1,136 +1,85 @@
-# Aether Weather Dashboard
+# Aether
 
-Aether is a responsive weather dashboard built with React 19 and Vite. It presents current conditions, an hourly temperature outlook, a seven-day forecast, saved places, location search, geolocation, Arabic/English localization, and light/dark/system themes.
+> The weather, as a living sky.
 
-The project is designed as a front-end portfolio application with a clear service boundary, resilient request handling, accessible interactions, and no exposed API credentials.
+Aether turns the forecast into a sky you can read at a glance. Its colours follow the **real position of the Sun** for each place and time,
+modified by current weather. Drag across the 48-hour chart and the whole sky travels with you.
 
-## Product features
+![Dashboard](docs/screenshots/dashboard-day.png)
 
-- **Live conditions:** temperature, feels-like temperature, humidity, wind, pressure, cloud cover, wind gusts, UV index, sunrise, and sunset.
-- **City search:** debounced geocoding with keyboard navigation and location details.
-- **Location access:** opt-in browser geolocation; the app never requests location access automatically.
-- **Forecasts:** a 12-hour outlook and a seven-day forecast, including precipitation probability where provided by the API.
-- **Saved places:** persist up to six frequently checked locations in local storage.
-- **Preferences:** Celsius/Fahrenheit, km/h/mph, Arabic/English, and light/dark/system theme.
-- **Resilient UI:** request cancellation, loading skeletons, retry states, network error handling, and empty search states.
-- **Accessibility:** semantic landmarks, keyboard-operable search results, visible focus states, labels, and reduced-motion support.
+| Time travel                                      | Command palette                                  |
+| ------------------------------------------------ | ------------------------------------------------ |
+| ![Night](docs/screenshots/time-travel-night.png) | ![Palette](docs/screenshots/command-palette.png) |
 
-## Tech stack
+| Mobile                                                             | Arabic · RTL · light                         |
+| ------------------------------------------------------------------ | -------------------------------------------- |
+| <img src="docs/screenshots/mobile.png" width="260" alt="Mobile" /> | ![Arabic](docs/screenshots/arabic-light.png) |
 
-- React 19
-- Vite 7
-- Modern CSS with design tokens and responsive layouts
-- Browser Fetch API and AbortController
-- Open-Meteo Forecast and Geocoding APIs
-- Node.js built-in test runner (`node:test`)
-- ESLint 9
+## Features
 
-The previous Redux, Material UI, Emotion, Tailwind, Axios, Moment, and i18next layers were removed because this application does not need a global server-state store or multiple overlapping UI systems. Weather fetching now lives behind a dedicated API module and a focused React hook.
+- **Live sky:** NOAA solar position, golden hour and twilight, stars, Sun and Moon (with phase), drifting clouds, fog, canvas rain/snow,
+  lightning.
+- **Time travel:** drag or use the keyboard (←/→, PageUp/PageDown, Home/End, Esc) on the 48-hour chart.
+- **Briefing:** rule-based insights (rain soon, heat, UV peak, air quality, best window outside, sunset…).
+- **Command palette:** `Ctrl/⌘ + K` or `/` to search places and run commands.
+- **Details:** 7-day forecast, sun arc, wind compass, UV gauge, air quality, moon phase, humidity/cloud/pressure.
+- **Preferences:** °C/°F, km/h · mph · m/s, light/dark/system, English/العربية (RTL), saved places, geolocation (opt-in).
+- **Resilient:** stale-while-revalidate forecast cache, offline app shell, offline banner, retry with backoff, and installable PWA.
+- **Installable app:** Android/Chromium install prompt, iOS Add to Home Screen instructions, standalone display mode, safe-area layouts,
+  branded app icons, and platform launch artwork.
+- **Launch experience:** a short animated Aether intro on cold launches of the installed standalone app (not on ordinary browser visits), with reduced-motion support. iOS startup artwork is supplied separately through Apple startup-image links.
+- **Weather alerts:** optional browser notifications for severe conditions while Aether is open. Background push needs a Web Push server.
 
-## Getting started
-
-### Requirements
-
-- Node.js 22 or newer (see `.nvmrc`)
-- npm 10 or newer
-
-### Install and run
+## Run it
 
 ```bash
 npm ci
-npm run dev
+npm run dev        # http://localhost:5173
+npm run check      # format, lint, typecheck, unit tests, build
+npm run e2e        # Playwright (mocked network)
+
+# Test the installed PWA (production service worker + manifest)
+npm run build && npm run preview  # http://localhost:4173
 ```
 
-Vite starts at `http://localhost:5173`.
+Node 22.22.2+ (`.nvmrc`). First e2e run: `npx playwright install chromium`.
 
-### Quality checks
+**Install the PWA:** use `npm run build && npm run preview` (or deploy over HTTPS). The service worker is intentionally disabled in
+`vite dev` so it does not interfere with hot-module replacement; the browser's native install prompt is therefore only testable in Preview
+or production. On iPhone/iPad, open the Share menu and choose **Add to Home Screen**.
+Deploying under a sub-path: `BASE_PATH=/aether/ npm run build`.
 
-```bash
-npm run lint
-npm test
-npm run build
+## Stack
+
+Vite 7 · React 19 + React Compiler · TypeScript strict · Zod 4 · Vitest · Playwright + axe · vite-plugin-pwa · self-hosted fonts
+(Manrope, Noto Sans Arabic).
+
+## Structure
+
 ```
-
-Or run all three in sequence:
-
-```bash
-npm run check
-```
-
-Preview the production build locally:
-
-```bash
-npm run preview
-```
-
-## Weather data provider
-
-Aether uses:
-
-- [Open-Meteo Forecast API](https://open-meteo.com/en/docs)
-- [Open-Meteo Geocoding API](https://open-meteo.com/en/docs/geocoding-api)
-
-The public Open-Meteo endpoints used here do not require an API key for non-commercial use. Review the provider's current [terms and pricing](https://open-meteo.com/en/pricing) before using this project commercially. The application includes provider attribution in the footer. If you move to a commercial plan, update the endpoint and integration in `src/features/weather/api/openMeteo.js` according to the provider's account requirements.
-
-No weather API key is stored in the repository or browser bundle.
-
-## Project structure
-
-```text
 src/
-├── app/
-│   └── App.jsx                         # Application composition and preferences
-├── features/
-│   └── weather/
-│       ├── api/
-│       │   └── openMeteo.js             # Provider adapter and request errors
-│       ├── components/
-│       │   ├── DailyForecast.jsx
-│       │   ├── HourlyForecast.jsx
-│       │   ├── LocationSearch.jsx
-│       │   ├── MetricCard.jsx
-│       │   ├── WeatherDashboard.jsx
-│       │   └── WeatherIcon.jsx
-│       ├── hooks/
-│       │   └── useWeather.js            # Request lifecycle and cancellation
-│       └── utils/
-│           └── weatherCode.js           # WMO code interpretation
-├── lib/
-│   ├── formatters.js
-│   ├── icons.jsx
-│   └── usePersistentState.js
-├── locales/
-│   └── messages.js                     # English and Arabic UI copy
-├── main.jsx
-└── styles.css
-
-tests/
-└── weather-utils.test.js
+  core/      pure logic: solar, moon, sky, particles, insights, spline, units, format
+  data/      HTTP, Zod schemas, Open-Meteo adapter, cache
+  state/     versioned persisted store
+  hooks/     forecast (SWR), online, clock, geolocation, hotkeys
+  i18n/      typed EN/AR dictionaries
+  features/  sky · forecast · search
+  app/       shell, header, footer
+tests/e2e/   Playwright specs
+docs/        ARCHITECTURE, REFACTOR, ADRs, screenshots
 ```
 
-See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the data flow and design decisions.
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/REFACTOR.md](docs/REFACTOR.md), [docs/PWA.md](docs/PWA.md) and [docs/adr](docs/adr).
 
-## Deployment to GitHub Pages
+## Honest limitations
 
-The Vite production base path is configured as `/weather-app/` for the repository's GitHub Pages deployment. Local development uses `/`.
-
-```bash
-npm run deploy
-```
-
-The `deploy` script builds the app and publishes the `dist` directory using `gh-pages`. Ensure GitHub Pages is configured to serve from the `gh-pages` branch.
-
-## Configuration
-
-There are no required environment variables for the current non-commercial Open-Meteo integration. `.env.example` is included as a reminder that credentials should be added only if a future provider requires them. Never commit private API keys.
-
-## Engineering notes
-
-- API responses are validated for the fields needed by the interface before they enter the UI.
-- Requests are aborted when a location or unit preference changes, preventing stale responses from overwriting newer selections.
-- Search uses a debounce and AbortController to limit unnecessary geocoding requests. The result panel is capped, scrollable, closes on outside interaction, and reserves layout space so it does not cover the weather dashboard.
-- Device-location identity is stored as structured data; its visible name and subtitle are resolved from the active locale, including previously saved coordinate-based locations.
-- User location is requested only after an explicit action.
-- Browser storage is treated as optional and guarded against unavailable or malformed values.
-- Temperatures and wind values are requested from the provider in the selected units rather than converted inconsistently in presentation components.
-- Forecast values are presented as model outputs; they are not represented as official warnings or guarantees.
+- Aether is a Progressive Web App, not a native Android/iOS binary. It can be installed and launched in standalone mode, but browser and
+  operating-system APIs determine which capabilities are available.
+- Geolocation is requested only after the user taps **Use my location**. Notifications are optional and requested only when the user enables
+  weather alerts. Camera, microphone, contacts, and unrelated permissions are not requested; the dashboard does not need them.
+- Severe-weather notifications are evaluated while the app is open. Background delivery needs a server-side Web Push sender, VAPID keys, and
+  subscription storage, which are not included in this frontend-only repository.
+- The Moon's on-screen position is stylised; the sky is an artistic model driven by real geometry, not a camera or an ephemeris.
+- Forecasts are model output and can differ from local observations.
+- Data comes from [Open-Meteo](https://open-meteo.com/) (CC BY 4.0; the free API is for non-commercial use).
+- The bundled e2e tests and screenshots use mocked responses; they never call the live API.

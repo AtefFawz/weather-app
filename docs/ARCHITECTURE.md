@@ -1,57 +1,55 @@
-# Architecture and engineering decisions
+# Architecture
 
-## 1. Feature-oriented organization
+Aether is a client-only SPA. The guiding rule: **pure logic at the centre, I/O and React at the edges.**
 
-The application is intentionally organized by capability rather than by technical layer alone.
+```mermaid
+flowchart LR
+  subgraph Edge["Edges (impure)"]
+    API[(Open-Meteo)] --> HTTP[data/http.ts<br/>retry · timeout · abort]
+    HTTP --> OM[data/openmeteo.ts<br/>zod validate + normalise]
+    LS[(localStorage)] <--> CACHE[data/forecast-cache.ts<br/>LRU · SWR]
+    LS <--> STORE[state/app-state.ts<br/>zod · versioned · migrations]
+  end
+  subgraph Core["core/ (pure, no DOM, no React)"]
+    SOLAR[solar.ts · moon.ts] --> SKYS[sky-state.ts]
+    SKY[sky.ts palette] --> SKYS
+    INS[insights.ts] ; COMF[comfort.ts] ; SPL[spline.ts] ; UNITS[units.ts · format.ts]
+  end
+  OM --> HOOK[hooks/use-forecast.ts]
+  CACHE --> HOOK
+  HOOK --> SHELL[app/app.tsx]
+  STORE --> SHELL
+  SKYS --> SHELL
+  INS --> SHELL
+  SHELL --> UI[features/*<br/>sky · forecast · search]
+```
 
-- `features/weather/api` owns communication with Open-Meteo and translates transport/provider failures into a small application error type.
-- `features/weather/hooks` owns the weather request lifecycle, cancellation, loading state, and errors.
-- `features/weather/components` owns the weather-specific presentation.
-- `lib` contains reusable browser and formatting utilities that are not coupled to a weather screen.
-- `locales` contains the UI copy and is the single source for English and Arabic labels.
-- `app` composes the application and owns cross-feature preferences and saved locations.
+## Layers
 
-This keeps provider-specific response details out of visual components and makes it possible to replace the weather provider without rewriting the dashboard.
+| Layer       | Responsibility                                                                            | Rules                                     |
+| ----------- | ----------------------------------------------------------------------------------------- | ----------------------------------------- |
+| `core/`     | Solar geometry, sky colour, particles, insights, comfort score, spline, units, formatting | No imports from React, DOM or `data/`     |
+| `data/`     | HTTP, schema validation, normalisation to the domain model, cache                         | Raw API shapes never leave this folder    |
+| `state/`    | Persisted preferences (units, theme, language, places)                                    | Pure transitions; storage is validated    |
+| `hooks/`    | Bridges to the outside world (forecast SWR, online, clock, geolocation, hotkeys)          |                                           |
+| `i18n/`     | Typed EN/AR dictionaries, interpolation, direction                                        | Missing keys fail `tsc`; parity is tested |
+| `features/` | UI grouped by feature                                                                     | Components render; logic lives in `core/` |
+| `app/`      | Shell: wires state, forecast, sky, palette                                                |                                           |
 
-## 2. Data flow
+## The sky
 
-1. A location is selected from search, saved places, the default location, or the browser geolocation permission flow.
-2. `useWeather` calls `fetchForecast` with the selected coordinates and unit preferences.
-3. The API adapter builds a typed-by-contract request, checks the HTTP response, parses JSON, and validates the required response sections.
-4. The hook aborts the previous request when its inputs change and prevents stale results from updating the screen.
-5. Components format and render the current, hourly, and daily data without owning network logic.
+`computeSky(lat, lon, time, weather)` is a pure function: NOAA solar position → elevation keyframes interpolated with smoothstep → weather modifiers (grey, darken, fog, cloud, particles). The result is written to CSS custom properties (`--sky-top`, `--sun-x`, …). Colours transition via registered `@property <color>`, so React never animates anything per frame. Rain and snow are a typed-array particle system drawn on one canvas.
 
-Search follows the same boundary through `searchLocations`, with a debounce in `LocationSearch` and cancellation on query changes.
+**Time travel:** the scrubber on the 48-hour chart supplies a different `time` and `weather` to the same function, so the sky, hero and readouts all move together.
 
-## 3. State ownership
+## Data flow and caching
 
-- Weather data is remote state and stays inside `useWeather`.
-- Selected location, favorites, units, language, and theme are user preferences composed at the application level.
-- Preferences are persisted through `usePersistentState`, which guards reads and writes because browser storage can be disabled or malformed.
-- There is no global Redux store because the application currently has one weather dashboard and no cross-route workflows that benefit from a heavier state container.
+1. The API is always asked for metric units. Conversion to °F / mph / m/s happens client-side, so toggling units never refetches and the cache is unit-agnostic.
+2. `useForecast` reads the cache first: fresh (< 10 min) → no request; stale (< 6 h) → show immediately and revalidate; none → loading.
+3. A failed refresh never blanks the screen: the last forecast stays with an explanatory banner.
+4. Air quality is optional (`allSettled`); its failure only hides that card.
 
-## 4. Resilience
+## Testing strategy
 
-- `AbortController` cancels obsolete weather and geocoding requests.
-- API failures are normalized into readable error codes.
-- The interface distinguishes initial loading, refresh, network failure, rate limiting, and no search results.
-- Browser geolocation is opt-in and has separate permission and availability failure states.
-- Unknown WMO codes fall back to a safe generic condition.
-- Missing measurements render as an em dash rather than `NaN` or misleading zero values.
-
-## 5. Accessibility and localization
-
-- The location search exposes combobox/listbox semantics and supports arrow keys, Enter, and Escape.
-- The layout uses semantic landmarks and labelled sections.
-- Buttons that only show icons have accessible names.
-- The application sets `lang` and `dir` at the document root when the selected language changes.
-- Arabic uses RTL layout while preserving numerical and icon direction where appropriate.
-- Motion is restrained and disabled under `prefers-reduced-motion`.
-
-## 6. Styling strategy
-
-CSS custom properties define page, panel, text, border, accent, and semantic colors. The light and dark palettes share the same components, avoiding duplicated markup or theme-specific component trees. Responsive breakpoints adapt the header controls, dashboard columns, metric cards, and forecast rows.
-
-## 7. Provider and usage boundary
-
-The public Open-Meteo endpoints are used for non-commercial access. Provider terms can change; confirm the current plan and attribution requirements before commercial use. Provider URLs and mapping logic are isolated in `src/features/weather/api/openMeteo.js`.
+- **Unit (vitest, ~105 tests):** solar/moon accuracy, sky continuity and WCAG contrast, spline monotonicity, insights, formatting, HTTP retry, schema/normalisation, cache expiry, state migration, i18n parity.
+- **E2E (Playwright, network mocked, clock frozen):** rendering, time travel by keyboard and drag, unit toggles without refetch, command palette, persistence, Arabic/RTL, error/stale/offline states, axe scans in both themes, mobile overflow.
