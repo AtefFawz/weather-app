@@ -4,6 +4,7 @@ import { VitePWA } from "vite-plugin-pwa";
 // eslint-disable-next-line no-undef
 const base = process.env.BASE_PATH ?? "/";
 
+
 export default defineConfig(() => ({
   // GitHub Pages can set BASE_PATH=/weather-app/. Local installs use /.
   base,
@@ -71,7 +72,13 @@ export default defineConfig(() => ({
         type: "module",
       },
     }),
-  ],
+ 
+export default defineConfig(({ mode }) => ({
+  // GitHub Pages serves this repository from /weather-app/.
+  // Local development and other deployments use the root path.
+  base: '/',
+  plugins: [react()],
+main
   build: {
     target: "es2022",
     sourcemap: false,
