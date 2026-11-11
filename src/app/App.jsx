@@ -14,7 +14,7 @@ import {
   useForecastShare,
 } from "../features/pwa/PwaControls";
 import { usePwa } from "../pwa/use-pwa";
-// ===
+
 const DEFAULT_LOCATION = {
   id: "kafr-el-dawwar-eg",
   name: "Kafr El-Dawwar",
