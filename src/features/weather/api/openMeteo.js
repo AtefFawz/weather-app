@@ -62,10 +62,9 @@ export async function searchLocations(query, { language = 'en', signal } = {}) {
   }));
 }
 
-export async function fetchForecast(location, {
+export function buildForecastUrl(location, {
   temperatureUnit = 'celsius',
   windSpeedUnit = 'kmh',
-  signal,
 } = {}) {
   const url = new URL(FORECAST_URL);
   url.search = new URLSearchParams({
@@ -107,7 +106,12 @@ export async function fetchForecast(location, {
     wind_speed_unit: windSpeedUnit,
   }).toString();
 
-  const payload = await requestJson(url, signal);
+  return url;
+}
+
+export async function fetchForecast(location, options = {}) {
+  const url = buildForecastUrl(location, options);
+  const payload = await requestJson(url, options.signal);
   if (!payload.current || !payload.daily || !payload.hourly) {
     throw new WeatherApiError('Weather data is incomplete.', 'incomplete_data');
   }

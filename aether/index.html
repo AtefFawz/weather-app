@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Aether — the weather, as a living sky</title>
+    <meta
+      name="description"
+      content="Aether turns the forecast into a living sky driven by real solar geometry. Scrub through the next 48 hours and watch the sky change."
+    />
+    <meta name="theme-color" content="#0b1026" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <script>
+      // Apply saved language/theme before first paint to avoid a flash. Mirrors state/app-state.ts.
+      try {
+        var raw = localStorage.getItem("aether:v2:state");
+        var s = raw ? JSON.parse(raw) : null;
+        var d = document.documentElement;
+        var st = s && (s.state || s);
+        var lang = st && st.language === "ar" ? "ar" : "en";
+        var pref = st && st.theme;
+        var light = pref === "light" || (pref !== "dark" && window.matchMedia("(prefers-color-scheme: light)").matches);
+        d.lang = lang;
+        d.dir = lang === "ar" ? "rtl" : "ltr";
+        d.dataset.theme = light ? "light" : "dark";
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>Aether needs JavaScript to draw the sky and load the forecast.</noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
