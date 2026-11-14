@@ -1,0 +1,64 @@
+/* Design tokens. The sky changes with the weather; the theme only changes the card material. */
+@property --sky-top {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #0b1026;
+}
+@property --sky-mid {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #1a2350;
+}
+@property --sky-bottom {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #2b2f63;
+}
+
+:root {
+  --font-sans: "Manrope Variable", "Noto Sans Arabic Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --radius-lg: 28px;
+  --radius-md: 20px;
+  --radius-sm: 12px;
+  --gap: clamp(12px, 2vw, 20px);
+  --gutter: clamp(16px, 4vw, 40px);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --sky-transition: 1.2s var(--ease);
+
+  /* Dark material (default) */
+  --text: #f4f7ff;
+  --text-muted: rgba(232, 238, 255, 0.78);
+  --surface: rgba(11, 16, 36, 0.58);
+  --surface-strong: rgba(11, 16, 36, 0.8);
+  --surface-hover: rgba(255, 255, 255, 0.1);
+  --border: rgba(255, 255, 255, 0.16);
+  --shadow: 0 10px 40px rgba(2, 6, 23, 0.35);
+  --accent: #7cc4ff;
+  --accent-strong: #a9d9ff;
+  --accent-ink: #06142b;
+  --rain: #63b3ff;
+  --track: rgba(255, 255, 255, 0.16);
+  --night-band: rgba(8, 12, 40, 0.3);
+  --focus: #ffd166;
+  --warn-bg: rgba(255, 183, 77, 0.2);
+  --warn-text: #ffe2ad;
+}
+
+:root[data-theme="light"] {
+  --text: #0e1a33;
+  --text-muted: rgba(14, 26, 51, 0.74);
+  --surface: rgba(255, 255, 255, 0.7);
+  --surface-strong: rgba(255, 255, 255, 0.92);
+  --surface-hover: rgba(14, 26, 51, 0.08);
+  --border: rgba(255, 255, 255, 0.8);
+  --shadow: 0 10px 40px rgba(20, 40, 90, 0.18);
+  --accent: #0b6bcb;
+  --accent-strong: #0a4f99;
+  --accent-ink: #ffffff;
+  --rain: #1c7ed6;
+  --track: rgba(14, 26, 51, 0.14);
+  --night-band: rgba(30, 40, 100, 0.12);
+  --focus: #0b57d0;
+  --warn-bg: rgba(255, 183, 77, 0.35);
+  --warn-text: #5c3b00;
+}

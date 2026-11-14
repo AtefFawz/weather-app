@@ -1,0 +1,357 @@
+/* Installable app chrome and first-launch experience. */
+.weather-alert-control--enabled {
+  color: var(--accent-strong);
+  border-color: color-mix(in srgb, var(--accent) 48%, transparent);
+  background: color-mix(in srgb, var(--accent) 13%, var(--surface));
+}
+.weather-alert-control:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.install-control {
+  min-height: 40px;
+  padding: 0 13px;
+  white-space: nowrap;
+}
+.install-control svg {
+  width: 16px;
+  height: 16px;
+}
+.install-control:disabled {
+  opacity: 0.82;
+  cursor: default;
+}
+
+.install-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: center;
+  padding: max(18px, env(safe-area-inset-top)) 18px max(18px, env(safe-area-inset-bottom));
+  background: rgba(4, 9, 24, 0.68);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  animation: pwa-fade-in 180ms ease-out both;
+}
+.install-dialog {
+  position: relative;
+  width: min(100%, 460px);
+  max-height: min(88dvh, 720px);
+  overflow: auto;
+  padding: clamp(24px, 5vw, 36px);
+  border: 1px solid rgba(190, 222, 255, 0.22);
+  border-radius: 30px;
+  color: #f4f7ff;
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(107, 169, 241, 0.2), transparent 52%),
+    linear-gradient(145deg, rgba(19, 31, 65, 0.98), rgba(9, 15, 35, 0.99));
+  box-shadow: 0 30px 100px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  animation: pwa-dialog-in 360ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
+}
+.install-dialog__close {
+  position: absolute;
+  top: 14px;
+  inset-inline-end: 14px;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 50%;
+  color: #e9f2ff;
+  background: rgba(255, 255, 255, 0.06);
+}
+.install-dialog__close svg {
+  width: 17px;
+  height: 17px;
+}
+.install-dialog__brand {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding-block: 4px 20px;
+}
+.install-dialog__brand img {
+  display: block;
+  width: 68px;
+  height: 68px;
+  border-radius: 19px;
+  box-shadow: 0 10px 35px rgba(89, 183, 239, 0.2);
+}
+.install-dialog__eyebrow {
+  color: #9fc8ec;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+}
+.install-dialog h2 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(1.55rem, 5vw, 2rem);
+  line-height: 1.15;
+  text-align: center;
+}
+.install-dialog > p {
+  max-width: 34ch;
+  margin: 12px auto 22px;
+  color: #c2d0e6;
+  line-height: 1.7;
+  text-align: center;
+}
+.install-dialog__steps {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: install-step;
+}
+.install-dialog__steps li {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid rgba(210, 229, 255, 0.1);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.045);
+}
+.install-dialog__steps li > span {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  color: #07172d;
+  background: linear-gradient(145deg, #b9efff, #72c7ea);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+.install-dialog__steps p {
+  color: #e3ecf9;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.install-dialog__privacy {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 13px;
+  border-radius: 14px;
+  color: #bbd5ea;
+  background: rgba(112, 193, 231, 0.09);
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+.install-dialog__privacy svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  margin-top: 2px;
+  color: #8edcf3;
+}
+.install-dialog__done {
+  width: 100%;
+  margin-top: 18px;
+  border: 0;
+  color: #06142b;
+  background: linear-gradient(100deg, #a8e8fa, #79b9ef);
+}
+
+.launch-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: max(28px, env(safe-area-inset-top)) 24px max(28px, env(safe-area-inset-bottom));
+  color: #f7faff;
+  background:
+    radial-gradient(ellipse at 50% 54%, rgba(255, 193, 115, 0.16), transparent 34%),
+    linear-gradient(155deg, #080f24 0%, #17264e 53%, #263b63 100%);
+  opacity: 1;
+  transition: opacity 440ms ease, visibility 440ms ease;
+}
+.launch-screen--leaving {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.launch-screen__stars {
+  position: absolute;
+  inset: 0;
+  opacity: 0.58;
+  background-image:
+    radial-gradient(circle at 12% 18%, #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle at 78% 12%, #b8eaff 0 1px, transparent 1.8px),
+    radial-gradient(circle at 85% 38%, #fff 0 1px, transparent 1.7px),
+    radial-gradient(circle at 23% 62%, #fff 0 1px, transparent 1.5px),
+    radial-gradient(circle at 70% 78%, #c4e8ff 0 1px, transparent 1.8px),
+    radial-gradient(circle at 42% 31%, #fff 0 1px, transparent 1.5px);
+  background-size: 280px 280px, 340px 340px, 390px 390px, 320px 320px, 420px 420px, 250px 250px;
+  animation: launch-stars 22s linear infinite;
+}
+.launch-screen__orbit {
+  position: absolute;
+  left: 50%;
+  top: 47%;
+  width: min(76vw, 570px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(180, 226, 255, 0.13);
+  border-radius: 50%;
+  box-shadow: 0 0 50px rgba(101, 177, 237, 0.06), inset 0 0 50px rgba(101, 177, 237, 0.04);
+  transform: translate(-50%, -50%) rotate(-24deg) scaleY(0.36);
+  animation: launch-orbit-in 900ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.launch-screen__orbit::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 9%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #b8efff;
+  box-shadow: 0 0 18px 5px rgba(122, 218, 255, 0.7);
+}
+.launch-screen__orbit--two {
+  width: min(94vw, 700px);
+  border-color: rgba(250, 190, 145, 0.13);
+  transform: translate(-50%, -50%) rotate(22deg) scaleY(0.27);
+  animation-delay: 100ms;
+}
+.launch-screen__orbit--two::after {
+  left: auto;
+  right: 13%;
+  background: #ffc18b;
+  box-shadow: 0 0 18px 5px rgba(255, 172, 124, 0.6);
+}
+.launch-screen__content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  animation: launch-content-in 850ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.launch-screen__icon {
+  width: clamp(92px, 25vw, 122px);
+  height: auto;
+  border-radius: 28%;
+  box-shadow: 0 14px 55px rgba(92, 191, 237, 0.27), 0 0 0 1px rgba(255, 255, 255, 0.2);
+  animation: launch-icon-float 3.8s ease-in-out 850ms infinite;
+}
+.launch-screen__kicker {
+  margin-top: 27px;
+  color: #a8d8ed;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.25em;
+}
+.launch-screen h1 {
+  margin-top: 7px;
+  color: #fff;
+  font-size: clamp(2.1rem, 8vw, 3.1rem);
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  line-height: 1.05;
+  text-indent: 0.2em;
+  text-shadow: 0 5px 35px rgba(136, 214, 255, 0.22);
+}
+.launch-screen__tagline {
+  margin-top: 10px;
+  color: #d2e0f3;
+  font-size: 0.9rem;
+  letter-spacing: 0.025em;
+}
+.launch-screen__progress {
+  width: 142px;
+  height: 3px;
+  margin-top: 42px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: rgba(220, 239, 255, 0.18);
+}
+.launch-screen__progress span {
+  display: block;
+  width: 42%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #9ceaff, #ffd09c);
+  box-shadow: 0 0 15px rgba(137, 224, 255, 0.9);
+  animation: launch-progress 1.15s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.launch-screen__loading {
+  margin-top: 13px;
+  color: rgba(222, 236, 252, 0.7);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+}
+.launch-screen__version {
+  position: absolute;
+  bottom: max(24px, env(safe-area-inset-bottom));
+  color: rgba(212, 229, 247, 0.38);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.24em;
+}
+
+@keyframes pwa-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes pwa-dialog-in {
+  from { opacity: 0; transform: translateY(18px) scale(0.975); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes launch-content-in {
+  from { opacity: 0; transform: translateY(20px) scale(0.985); filter: blur(8px); }
+  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+@keyframes launch-icon-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+@keyframes launch-orbit-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes launch-stars {
+  from { transform: translateY(0); }
+  to { transform: translateY(-60px); }
+}
+@keyframes launch-progress {
+  from { transform: translateX(-110%); }
+  to { transform: translateX(250%); }
+}
+
+@media (max-width: 760px) {
+  .install-control {
+    width: 40px;
+    height: 40px;
+    min-height: 40px;
+    padding: 0;
+    border-radius: 50%;
+  }
+  .install-control span { display: none; }
+  .install-control svg { width: 18px; height: 18px; }
+}
+@media (max-width: 420px) {
+  .install-dialog { border-radius: 24px; }
+  .install-dialog__brand { padding-top: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .install-dialog-backdrop,
+  .install-dialog,
+  .launch-screen__stars,
+  .launch-screen__orbit,
+  .launch-screen__content,
+  .launch-screen__icon,
+  .launch-screen__progress span {
+    animation: none !important;
+  }
+  .launch-screen { transition: opacity 100ms linear, visibility 100ms linear; }
+}
